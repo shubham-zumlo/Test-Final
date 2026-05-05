@@ -141,16 +141,32 @@
       return;
     }
     container.innerHTML = '';
-    entries.slice().reverse().forEach(function(entry, idx) {
-      const realIdx = entries.length - 1 - idx;
-      const div = document.createElement('div');
+    for (var i = entries.length - 1; i >= 0; i--) {
+      var entry = entries[i];
+      var div = document.createElement('div');
       div.className = 'entry';
-      div.innerHTML =
-        '<p class="entry-timestamp">' + entry.timestamp + '</p>' +
-        '<p class="entry-text">' + escapeHtml(entry.text) + '</p>' +
-        '<button class="delete-btn" title="Delete entry" onclick="deleteEntry(' + realIdx + ')">✕</button>';
+
+      var timestamp = document.createElement('p');
+      timestamp.className = 'entry-timestamp';
+      timestamp.textContent = entry.timestamp;
+
+      var text = document.createElement('p');
+      text.className = 'entry-text';
+      text.textContent = entry.text;
+
+      var btn = document.createElement('button');
+      btn.className = 'delete-btn';
+      btn.title = 'Delete entry';
+      btn.textContent = '✕';
+      btn.addEventListener('click', (function(idx) {
+        return function() { deleteEntry(idx); };
+      })(i));
+
+      div.appendChild(timestamp);
+      div.appendChild(text);
+      div.appendChild(btn);
       container.appendChild(div);
-    });
+    }
   }
 
   function saveEntry() {
@@ -180,15 +196,6 @@
     entries.splice(index, 1);
     persistEntries(entries);
     renderEntries();
-  }
-
-  function escapeHtml(str) {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
   }
 
   renderEntries();
