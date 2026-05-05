@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>My Journal</title>
   <style>
     *, *::before, *::after {
@@ -13,153 +13,405 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f4f8;
-      color: #333;
+      background: #d6d6d6;
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 40px 16px;
+      align-items: flex-start;
+      padding: 32px 16px;
     }
 
-    .container {
-      width: 100%;
-      max-width: 680px;
+    /* Phone frame */
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: linear-gradient(150deg, #e8cfa0 0%, #ede8dc 22%, #cfddd0 55%, #bfd0c5 100%);
+      border-radius: 50px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(255,255,255,0.4);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
 
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 24px;
-      color: #2d6a4f;
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px 4px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #222;
+      letter-spacing: 0.2px;
     }
 
-    .editor {
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      margin-bottom: 32px;
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
 
-    textarea {
-      width: 100%;
-      height: 160px;
-      resize: vertical;
-      border: 1px solid #cdd9e5;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 1rem;
-      line-height: 1.6;
-      outline: none;
-      transition: border-color 0.2s;
+    /* Nav bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 22px 12px;
     }
 
-    textarea:focus {
-      border-color: #2d6a4f;
-    }
-
-    button {
-      margin-top: 14px;
-      width: 100%;
-      padding: 12px;
-      background: #2d6a4f;
-      color: #fff;
+    .nav-btn {
       border: none;
-      border-radius: 8px;
-      font-size: 1rem;
       cursor: pointer;
-      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.15s;
     }
 
-    button:hover {
-      background: #1b4332;
+    .nav-btn:active {
+      opacity: 0.7;
     }
 
-    button:disabled {
-      background: #a8c5b5;
-      cursor: not-allowed;
+    .nav-btn-back {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 13px;
+      color: #333;
+      font-size: 26px;
+      line-height: 1;
+      padding-bottom: 2px;
     }
 
-    h2 {
-      font-size: 1.2rem;
-      margin-bottom: 16px;
-      color: #555;
+    .nav-btn-save {
+      width: 44px;
+      height: 44px;
+      background: #5ec4a3;
+      border-radius: 50%;
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      transition: background 0.2s, opacity 0.2s;
+    }
+
+    .nav-btn-save:disabled {
+      background: #9fc9bc;
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    /* Content area */
+    .content {
+      flex: 1;
+      padding: 10px 24px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .prompt-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .prompt-text {
+      flex: 1;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 26px;
+      font-style: italic;
+      color: #1e1e1e;
+      line-height: 1.35;
+    }
+
+    .edit-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.65);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      margin-top: 4px;
+      flex-shrink: 0;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s;
+    }
+
+    .edit-icon:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .action-pills {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      background: #3d2c5e;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-family: 'Segoe UI', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+
+    .pill:hover {
+      background: #2e1f4a;
+    }
+
+    .pill:active {
+      background: #1e1235;
+    }
+
+    /* Writing area */
+    .writing-area {
+      flex: 1;
+    }
+
+    #entry-input {
+      width: 100%;
+      min-height: 220px;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 16px;
+      font-style: italic;
+      color: #333;
+      line-height: 1.7;
+      caret-color: #555;
+    }
+
+    #entry-input::placeholder {
+      color: #a0aa9a;
+      font-style: italic;
+    }
+
+    /* Entries panel */
+    .entries-panel {
+      background: rgba(255, 255, 255, 0.28);
+      border-radius: 24px 24px 0 0;
+      padding: 18px 20px 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .entries-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .entries-panel::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.15);
+      border-radius: 4px;
+    }
+
+    .entries-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #6a7a68;
+      margin-bottom: 14px;
     }
 
     #entries-list {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 10px;
     }
 
     .entry {
-      background: #fff;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 14px;
+      padding: 14px 38px 14px 14px;
       position: relative;
     }
 
     .entry-date {
-      font-size: 0.8rem;
-      color: #888;
-      margin-bottom: 8px;
+      font-size: 11px;
+      color: #8a9488;
+      margin-bottom: 5px;
+      font-family: 'Segoe UI', sans-serif;
     }
 
     .entry-text {
-      font-size: 1rem;
-      line-height: 1.6;
+      font-size: 14px;
+      color: #2e2e2e;
+      line-height: 1.55;
       white-space: pre-wrap;
       word-break: break-word;
+      font-family: Georgia, serif;
     }
 
     .entry-delete {
       position: absolute;
-      top: 14px;
-      right: 14px;
+      top: 10px;
+      right: 10px;
       background: none;
       border: none;
       color: #bbb;
-      font-size: 1.1rem;
+      font-size: 13px;
       cursor: pointer;
-      padding: 0;
+      padding: 4px;
       width: auto;
       margin: 0;
-      transition: color 0.2s;
+      line-height: 1;
+      transition: color 0.15s;
     }
 
     .entry-delete:hover {
-      background: none;
       color: #e63946;
+      background: none;
     }
 
     .empty-state {
       text-align: center;
-      color: #aaa;
-      font-size: 0.95rem;
-      padding: 24px 0;
+      color: #a0aa9a;
+      font-size: 13px;
+      padding: 10px 0 4px;
+      font-style: italic;
+    }
+
+    /* Responsive: full-screen on real mobile */
+    @media (max-width: 430px) {
+      body {
+        padding: 0;
+        background: linear-gradient(150deg, #e8cfa0 0%, #ede8dc 22%, #cfddd0 55%, #bfd0c5 100%);
+      }
+      .phone {
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📓 My Journal</h1>
-
-    <div class="editor">
-      <textarea id="entry-input" placeholder="Write your thoughts for today…"></textarea>
-      <button id="save-btn" disabled>Save Entry</button>
+  <div class="phone">
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <!-- Signal bars -->
+        <svg width="18" height="13" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="7" width="3" height="6" rx="1" fill="#222"/>
+          <rect x="4.5" y="4.5" width="3" height="8.5" rx="1" fill="#222"/>
+          <rect x="9" y="2" width="3" height="11" rx="1" fill="#222"/>
+          <rect x="13.5" y="0" width="3" height="13" rx="1" fill="#222" opacity="0.28"/>
+        </svg>
+        <!-- Wi-Fi -->
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#222"/>
+          <path d="M3.76 7.24A6 6 0 0 1 8 5.5a6 6 0 0 1 4.24 1.74l1.42-1.42A8 8 0 0 0 8 3.5a8 8 0 0 0-5.66 2.32l1.42 1.42z" fill="#222"/>
+          <path d="M8 .5a11.95 11.95 0 0 0-8.49 3.51l1.42 1.42A10 10 0 0 1 8 2.5a10 10 0 0 1 7.07 2.93l1.42-1.42A11.95 11.95 0 0 0 8 .5z" fill="#222"/>
+        </svg>
+        <!-- Battery -->
+        <svg width="26" height="13" viewBox="0 0 26 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0.5" y="1.5" width="22" height="10" rx="2.5" stroke="#222" stroke-width="1"/>
+          <rect x="23" y="4" width="2.5" height="5" rx="1.25" fill="#222"/>
+          <rect x="1.5" y="2.5" width="19" height="8" rx="2" fill="#222"/>
+        </svg>
+      </div>
     </div>
 
-    <h2>Previous Entries</h2>
-    <div id="entries-list"></div>
+    <!-- Navigation -->
+    <div class="nav-bar">
+      <button class="nav-btn nav-btn-back" id="back-btn" title="Discard entry">&#8249;</button>
+      <button class="nav-btn nav-btn-save" id="save-btn" disabled title="Save entry">✓</button>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="prompt-row">
+        <span class="prompt-text" id="prompt-text">What quietly took care of you today?</span>
+        <button class="edit-icon" id="edit-prompt-btn" title="Edit prompt">✏️</button>
+      </div>
+
+      <div class="action-pills">
+        <button class="pill" id="new-prompt-btn">🔄 New prompt</button>
+        <button class="pill" id="help-btn">💡 Help me to write</button>
+      </div>
+
+      <div class="writing-area">
+        <textarea id="entry-input" placeholder="Start writing"></textarea>
+      </div>
+    </div>
+
+    <!-- Previous entries -->
+    <div class="entries-panel">
+      <p class="entries-title">Previous Entries</p>
+      <div id="entries-list"></div>
+    </div>
   </div>
 
   <script>
     const textarea = document.getElementById('entry-input');
     const saveBtn = document.getElementById('save-btn');
     const entriesList = document.getElementById('entries-list');
+    const promptTextEl = document.getElementById('prompt-text');
 
     const STORAGE_KEY = 'journal_entries';
+
+    const prompts = [
+      'What quietly took care of you today?',
+      'What are you grateful for right now?',
+      'What made you smile today?',
+      'What would you like to let go of today?',
+      'What is something you learned today?',
+      'What moment do you want to remember?',
+      'How did you show kindness today?',
+      'What challenged you and how did you grow?',
+    ];
+
+    let currentPromptIndex = 0;
+
+    document.getElementById('new-prompt-btn').addEventListener('click', () => {
+      currentPromptIndex = (currentPromptIndex + 1) % prompts.length;
+      promptTextEl.textContent = prompts[currentPromptIndex];
+    });
+
+    document.getElementById('help-btn').addEventListener('click', () => {
+      const starters = [
+        'Today I noticed…',
+        'Something that surprised me was…',
+        'I felt grateful when…',
+        'A small joy today was…',
+        'I'm thinking about…',
+      ];
+      if (!textarea.value.trim()) {
+        textarea.value = starters[Math.floor(Math.random() * starters.length)];
+        textarea.dispatchEvent(new Event('input'));
+      }
+      textarea.focus();
+    });
+
+    document.getElementById('edit-prompt-btn').addEventListener('click', () => {
+      const custom = window.prompt('Enter your own prompt:', promptTextEl.textContent);
+      if (custom && custom.trim()) {
+        promptTextEl.textContent = custom.trim();
+      }
+    });
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      if (!textarea.value.trim() || window.confirm('Discard this entry?')) {
+        textarea.value = '';
+        saveBtn.disabled = true;
+      }
+    });
 
     function loadEntries() {
       try {
@@ -236,7 +488,6 @@
       renderEntries();
     }
 
-    // Enable/disable save button based on textarea content
     textarea.addEventListener('input', () => {
       saveBtn.disabled = textarea.value.trim() === '';
     });
@@ -250,7 +501,6 @@
       textarea.focus();
     });
 
-    // Initial render
     renderEntries();
   </script>
 </body>
