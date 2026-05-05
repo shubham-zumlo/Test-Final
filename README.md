@@ -4,7 +4,7 @@ A simple, beautiful journaling app that runs entirely in your browser — no ins
 
 ## Preview
 
-![My Journal App](https://github.com/user-attachments/assets/f8ea9045-fa8f-47a0-ad4a-f2839fdecc34)
+![My Journal App](https://github.com/user-attachments/assets/6b76161d-ff8c-429f-9ee9-a7dfd6e16538)
 
 ## How to Use (No coding required!)
 
@@ -14,8 +14,10 @@ A simple, beautiful journaling app that runs entirely in your browser — no ins
 
 ## Features
 
-- ✏️ Write journal entries in the text box
-- 💾 Save entries with the **Save Entry** button
-- 📋 View all your previous entries below
+- ✏️ Write journal entries in the writing area
+- ✅ Save entries with the **teal checkmark** button (top right)
+- 🔄 Cycle through journal prompts with **New prompt**
+- 💡 Get a writing starter with **Help me to write**
+- 📋 View all your previous entries in the panel below
 - 🗑️ Delete any entry with the ✕ button
 - 💾 Entries are saved in your browser automatically (no account needed)
