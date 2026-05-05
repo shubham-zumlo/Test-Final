@@ -76,6 +76,15 @@ function renderTagPills(tags) {
   return tags.map(t => `<span class="tag-pill">#${escHtml(t)}</span>`).join('');
 }
 
+/** Unbiased random integer in [0, max) using rejection sampling. */
+function cryptoRandInt(max) {
+  if (max <= 1) return 0;
+  const arr   = new Uint32Array(1);
+  const limit = (2 ** 32) - ((2 ** 32) % max);
+  do { crypto.getRandomValues(arr); } while (arr[0] >= limit);
+  return arr[0] % max;
+}
+
 // ─── Clock ────────────────────────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
@@ -178,7 +187,7 @@ window.nextPrompt = function() {
 window.helpWrite = function() {
   const ta = document.getElementById('entry-input');
   if (!ta?.value.trim()) {
-    const idx = crypto.getRandomValues(new Uint32Array(1))[0] % STARTERS.length;
+    const idx = cryptoRandInt(STARTERS.length);
     ta.value = STARTERS[idx];
     window.onInput();
   }
@@ -459,7 +468,7 @@ window.deleteEntryUI = function(id) {
 // ─── Detail View ──────────────────────────────────────────────────────────────
 window.openDetail = function(id) {
   if (!state.user) return;
-  const entry = loadEntries(state.user.id).find(e => e.id == id);
+  const entry = loadEntries(state.user.id).find(e => e.id === id);
   if (!entry) return;
   state.detailEntryId = id;
 
@@ -491,7 +500,7 @@ window.deleteCurrentDetail = function() {
 
 window.editCurrentDetail = function() {
   if (!state.detailEntryId || !state.user) return;
-  const entry = loadEntries(state.user.id).find(e => e.id == state.detailEntryId);
+  const entry = loadEntries(state.user.id).find(e => e.id === state.detailEntryId);
   if (!entry) return;
   state.editingEntryId = state.detailEntryId;
 
@@ -515,7 +524,7 @@ window.editCurrentDetail = function() {
 window.toggleFavorite = function(id, btn) {
   if (!state.user) return;
   const all   = loadAllEntries();
-  const entry = all.find(e => e.id == id);
+  const entry = all.find(e => e.id === id);
   if (!entry) return;
   entry.isFavorite = !entry.isFavorite;
   saveAllEntries(all);
