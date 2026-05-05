@@ -567,10 +567,160 @@
       body { padding: 0; background: var(--bg-grad); }
       .phone { width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; }
     }
+
+    /* ── LOGIN / ONBOARDING ── */
+    .login-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 500;
+      background: var(--bg-grad);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 52px 28px 32px;
+      overflow-y: auto;
+      transition: opacity 0.35s ease;
+    }
+    .login-overlay.hidden { opacity: 0; pointer-events: none; }
+    .login-box { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 320px; }
+    .login-logo { font-size: 62px; }
+    .login-app-name { font-family: Georgia, serif; font-size: 28px; font-weight: 700; color: var(--text); margin-top: -4px; }
+    .login-tagline { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; }
+    .login-field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); align-self: flex-start; }
+    .avatar-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 4px; }
+    .avatar-btn {
+      font-size: 28px; width: 48px; height: 48px;
+      background: rgba(255,255,255,0.5); border: 2.5px solid transparent;
+      border-radius: 14px; cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .avatar-btn.selected { border-color: var(--accent); background: rgba(255,255,255,0.9); transform: scale(1.08); }
+    .login-name-input {
+      width: 100%; background: rgba(255,255,255,0.7);
+      border: 1.5px solid rgba(255,255,255,0.9); border-radius: 14px;
+      padding: 13px 16px; font-size: 16px; color: var(--text); outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .login-name-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.92); }
+    .login-start-btn {
+      width: 100%; background: var(--accent); color: white; border: none;
+      border-radius: 18px; padding: 16px; font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 4px;
+    }
+    .login-start-btn:hover { background: var(--accent-dark); }
+    .login-start-btn:active { transform: scale(0.98); }
+
+    /* ── DAILY INTENTION ── */
+    .intention-wrap { margin: 0 24px 14px; }
+    .intention-input {
+      width: 100%; background: rgba(255,255,255,0.55);
+      border: 1.5px solid rgba(255,255,255,0.8); border-radius: 14px;
+      padding: 11px 16px; font-size: 14px; color: var(--text);
+      outline: none; font-style: italic;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .intention-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.85); }
+    .intention-input::placeholder { color: var(--muted); }
+
+    /* ── MOOD CHART ── */
+    .mood-chart-wrap {
+      margin: 0 24px 16px;
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: 18px; padding: 12px 14px 10px;
+    }
+    .mood-chart-bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 4px; height: 56px; margin-bottom: 4px; }
+    .mood-chart-bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+    .mood-chart-bar { width: 100%; border-radius: 5px 5px 2px 2px; min-height: 4px; transition: height 0.4s ease; }
+    .mood-chart-day { font-size: 9px; font-weight: 600; color: var(--muted); text-align: center; }
+    .mood-chart-emoji { font-size: 13px; line-height: 1; }
+
+    /* ── FAVORITES ── */
+    .fav-btn {
+      position: absolute; top: 10px; right: 36px;
+      background: none; border: none; font-size: 15px;
+      cursor: pointer; padding: 4px; opacity: 0.35;
+      transition: opacity 0.15s, transform 0.15s; line-height: 1;
+    }
+    .fav-btn.active { opacity: 1; transform: scale(1.2); }
+    .full-entry-card.favorited { border-color: rgba(255,200,0,0.55); background: rgba(255,255,255,0.72); }
+
+    /* ── PROFILE IN SETTINGS ── */
+    .profile-banner {
+      margin: 0 24px 20px;
+      background: var(--purple); border-radius: 20px;
+      padding: 18px 20px; display: flex; align-items: center;
+      gap: 14px; cursor: pointer; transition: background 0.15s;
+    }
+    .profile-banner:hover { background: var(--purple-dark); }
+    .profile-avatar-big { font-size: 42px; }
+    .profile-name-big { font-family: Georgia, serif; font-size: 18px; font-weight: 700; color: white; }
+    .profile-edit-hint { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .profile-banner-arrow { margin-left: auto; color: rgba(255,255,255,0.45); font-size: 20px; }
+
+    /* ── PROFILE EDIT MODAL ── */
+    .modal-overlay {
+      position: absolute; inset: 0; z-index: 400;
+      background: rgba(0,0,0,0.38);
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal-sheet {
+      background: #f3ede3; border-radius: 28px 28px 0 0;
+      padding: 20px 24px 36px; width: 100%;
+      display: flex; flex-direction: column; gap: 14px;
+      transform: translateY(20px); transition: transform 0.25s;
+    }
+    .modal-overlay.show .modal-sheet { transform: translateY(0); }
+    .modal-header { display: flex; align-items: center; gap: 10px; }
+    .modal-title { font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: var(--text); }
+    .modal-close {
+      margin-left: auto; background: rgba(0,0,0,0.08); border: none;
+      width: 32px; height: 32px; border-radius: 50%; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-save-btn {
+      background: var(--accent); color: white; border: none;
+      border-radius: 14px; padding: 14px; font-size: 15px;
+      font-weight: 700; cursor: pointer; width: 100%; transition: background 0.15s;
+    }
+    .modal-save-btn:hover { background: var(--accent-dark); }
   </style>
 </head>
 <body>
 <div class="phone">
+
+  <!-- ── LOGIN OVERLAY ── -->
+  <div id="login-overlay" class="login-overlay">
+    <div class="login-box">
+      <div class="login-logo">📓</div>
+      <div class="login-app-name">My Journal</div>
+      <div class="login-tagline">Your private space for thoughts,<br>gratitude &amp; reflection.</div>
+      <div class="login-field-label">Pick your avatar</div>
+      <div class="avatar-grid" id="login-avatar-grid"></div>
+      <div class="login-field-label">Your name</div>
+      <input id="login-name-input" class="login-name-input" type="text" maxlength="20" placeholder="e.g. Alex"
+             onkeydown="if(event.key==='Enter')startJournal()" />
+      <button class="login-start-btn" onclick="startJournal()">Start Journaling ✨</button>
+    </div>
+  </div>
+
+  <!-- ── PROFILE EDIT MODAL ── -->
+  <div id="profile-modal" class="modal-overlay" onclick="if(event.target===this)closeProfileModal()">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">Edit Profile</div>
+        <button class="modal-close" onclick="closeProfileModal()">✕</button>
+      </div>
+      <div class="login-field-label">Avatar</div>
+      <div class="avatar-grid" id="modal-avatar-grid"></div>
+      <div class="login-field-label">Name</div>
+      <input id="modal-name-input" class="login-name-input" type="text" maxlength="20" placeholder="Your name…"
+             onkeydown="if(event.key==='Enter')saveProfileModal()" />
+      <button class="modal-save-btn" onclick="saveProfileModal()">Save Changes</button>
+    </div>
+  </div>
 
   <!-- Status bar -->
   <div class="status-bar">
@@ -592,6 +742,12 @@
         <div class="home-date" id="home-date">Monday, May 5</div>
       </div>
 
+      <!-- Daily intention -->
+      <div class="intention-wrap">
+        <input id="intention-input" class="intention-input" type="text" maxlength="80"
+               placeholder="✨ Set today's intention…" oninput="saveIntention()" />
+      </div>
+
       <!-- Streak card -->
       <div class="streak-card">
         <div class="streak-flame">🔥</div>
@@ -603,6 +759,12 @@
           <div class="streak-best">Best streak</div>
           <div class="streak-best-num" id="best-streak">0</div>
         </div>
+      </div>
+
+      <!-- 7-Day Mood Chart -->
+      <div class="section-title" style="margin-top:12px;">7-Day Mood</div>
+      <div class="mood-chart-wrap">
+        <div class="mood-chart-bars" id="mood-chart-bars"></div>
       </div>
 
       <!-- Stats -->
@@ -683,6 +845,7 @@
           <button class="filter-pill" data-filter="😐" onclick="setFilter('😐',this)">😐 Okay</button>
           <button class="filter-pill" data-filter="😔" onclick="setFilter('😔',this)">😔 Low</button>
           <button class="filter-pill" data-filter="😤" onclick="setFilter('😤',this)">😤 Stressed</button>
+          <button class="filter-pill" data-filter="starred" onclick="setFilter('starred',this)">⭐ Starred</button>
         </div>
       </div>
       <div class="entries-list-area" id="entries-list-area"></div>
@@ -692,6 +855,16 @@
     <div class="screen" id="screen-settings">
       <div class="settings-header">
         <div class="settings-title">Settings</div>
+      </div>
+
+      <!-- Profile banner -->
+      <div class="profile-banner" id="profile-banner" onclick="openProfileModal()">
+        <div class="profile-avatar-big" id="settings-avatar">🧑</div>
+        <div>
+          <div class="profile-name-big" id="settings-name">Friend</div>
+          <div class="profile-edit-hint">Tap to edit profile</div>
+        </div>
+        <div class="profile-banner-arrow">›</div>
       </div>
 
       <div class="settings-section">
@@ -752,7 +925,10 @@
     <div class="screen" id="screen-detail">
       <div class="detail-nav">
         <button class="nav-btn nav-btn-back" onclick="closeDetail()">‹</button>
-        <button class="nav-btn nav-btn-back" onclick="deleteCurrentDetail()" style="font-size:18px;color:#e63946;">🗑️</button>
+        <div style="display:flex;gap:8px;">
+          <button class="nav-btn nav-btn-back" onclick="editCurrentDetail()" style="font-size:18px;" title="Edit entry">✏️</button>
+          <button class="nav-btn nav-btn-back" onclick="deleteCurrentDetail()" style="font-size:18px;color:#e63946;" title="Delete entry">🗑️</button>
+        </div>
       </div>
       <div class="detail-content">
         <div class="detail-date" id="detail-date"></div>
@@ -792,6 +968,8 @@
 /* ─── Storage ─── */
 const STORAGE_KEY = 'journal_entries_v2';
 const PREFS_KEY   = 'journal_prefs';
+const PROFILE_KEY = 'journal_profile';
+const INTENTION_KEY = 'journal_intention';
 
 function loadEntries() {
   try {
@@ -816,6 +994,16 @@ let selectedHomeMood = '';
 let currentPromptIdx = 0;
 let detailEntryId = null;
 let idCounter = 0;
+let editingEntryId = null;
+let selectedLoginAvatar = '🧑';
+let selectedModalAvatar = '🧑';
+
+const AVATARS = ['🧑','👩','🧔','👧','🦋','🌙','🌟','🐱','🦊','🐻'];
+
+const MOOD_COLORS = {
+  '😄': '#4caf81', '🙂': '#8bc34a', '😐': '#ffc107',
+  '😔': '#ff9800', '😤': '#f44336', '📝': '#b0b8b0',
+};
 
 const prompts = [
   'What quietly took care of you today?',
@@ -855,8 +1043,8 @@ function showScreen(name, skipHistory) {
   if (name === 'entries') renderEntriesList();
 }
 
-function goHome() { showScreen('home'); }
-function goWrite() { showScreen('write'); }
+function goHome() { editingEntryId = null; showScreen('home'); }
+function goWrite() { editingEntryId = null; showScreen('write'); }
 
 /* ─── Write screen ─── */
 function onInput() {
@@ -897,21 +1085,30 @@ function saveEntry() {
   const ta = document.getElementById('entry-input');
   const text = ta.value.trim();
   if (!text) return;
-  const entries = loadEntries();
-  entries.push({
-    id: Date.now() + (++idCounter),
-    date: new Date().toISOString(),
-    text,
-    mood: selectedWriteMood || '📝',
-    prompt: document.getElementById('prompt-text').textContent,
-  });
+  let entries = loadEntries();
+  if (editingEntryId !== null) {
+    entries = entries.map(e => e.id === editingEntryId
+      ? { ...e, text, mood: selectedWriteMood || e.mood || '📝', prompt: document.getElementById('prompt-text').textContent }
+      : e);
+    editingEntryId = null;
+    showToast('Entry updated! ✓');
+  } else {
+    entries.push({
+      id: Date.now() + (++idCounter),
+      date: new Date().toISOString(),
+      text,
+      mood: selectedWriteMood || '📝',
+      prompt: document.getElementById('prompt-text').textContent,
+      favorite: false,
+    });
+    showToast('Entry saved! 🎉');
+  }
   saveEntries(entries);
   ta.value = '';
   selectedWriteMood = '';
   document.querySelectorAll('.write-mood-btn').forEach(b => b.classList.remove('selected'));
   document.getElementById('save-btn').disabled = true;
   document.getElementById('word-count').textContent = '0 words';
-  showToast('Entry saved! 🎉');
   showScreen('home');
 }
 
@@ -927,10 +1124,13 @@ function setHomeMood(mood, btn) {
 }
 
 function refreshHome() {
+  const profile = loadProfile();
+  const name = profile ? profile.name : null;
+  const avatar = profile ? (' ' + profile.avatar) : '';
   const now = new Date();
   const hour = now.getHours();
   const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('home-greeting').textContent = greet;
+  document.getElementById('home-greeting').textContent = greet + (name ? ', ' + name + '!' : '') + avatar;
   document.getElementById('home-date').textContent = now.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
 
   const entries = loadEntries();
@@ -959,6 +1159,8 @@ function refreshHome() {
   const el = document.getElementById('home-recent');
   if (recent.length === 0) {
     el.innerHTML = '<p class="home-empty">No entries yet. Start writing! ✍️</p>';
+    renderMoodChart();
+    restoreIntention();
     return;
   }
   el.innerHTML = recent.map(e => `
@@ -968,6 +1170,8 @@ function refreshHome() {
       <div class="entry-card-mood">${e.mood || '📝'}</div>
     </div>
   `).join('');
+  renderMoodChart();
+  restoreIntention();
 }
 
 function calcStreak(entries) {
@@ -1008,7 +1212,8 @@ function setFilter(f, btn) {
 function renderEntriesList() {
   const query = (document.getElementById('search-input').value || '').toLowerCase().trim();
   let entries = loadEntries().slice().reverse();
-  if (activeFilter !== 'all') entries = entries.filter(e => e.mood === activeFilter);
+  if (activeFilter === 'starred') entries = entries.filter(e => e.favorite);
+  else if (activeFilter !== 'all') entries = entries.filter(e => e.mood === activeFilter);
   if (query) entries = entries.filter(e => e.text.toLowerCase().includes(query));
   const el = document.getElementById('entries-list-area');
   if (entries.length === 0) {
@@ -1016,12 +1221,13 @@ function renderEntriesList() {
     return;
   }
   el.innerHTML = entries.map(e => `
-    <div class="full-entry-card" onclick="openDetail(${e.id})">
+    <div class="full-entry-card${e.favorite ? ' favorited' : ''}" onclick="openDetail(${e.id})">
       <div class="full-entry-card-top">
         <span class="full-entry-card-mood">${e.mood || '📝'}</span>
         <span class="full-entry-card-date">${formatDate(e.date)}</span>
       </div>
       <div class="full-entry-card-text">${escHtml(e.text)}</div>
+      <button class="fav-btn${e.favorite ? ' active' : ''}" onclick="event.stopPropagation();toggleFavorite(${e.id},this)" title="Favorite">⭐</button>
       <button class="entry-delete-btn" onclick="event.stopPropagation();deleteEntry(${e.id})">✕</button>
     </div>
   `).join('');
@@ -1107,6 +1313,158 @@ function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+/* ─── Profile ─── */
+function loadProfile() {
+  try { const p = JSON.parse(localStorage.getItem(PROFILE_KEY)); return (p && p.name) ? p : null; }
+  catch { return null; }
+}
+function saveProfile(p) { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }
+
+function renderAvatarGrid(containerId, current, onClickFnName) {
+  const grid = document.getElementById(containerId);
+  if (!grid) return;
+  grid.innerHTML = AVATARS.map(a =>
+    `<button class="avatar-btn${a===current?' selected':''}" onclick="${onClickFnName}(this,'${a}')">${a}</button>`
+  ).join('');
+}
+
+function pickLoginAvatar(btn, av) {
+  selectedLoginAvatar = av;
+  document.querySelectorAll('#login-avatar-grid .avatar-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function pickModalAvatar(btn, av) {
+  selectedModalAvatar = av;
+  document.querySelectorAll('#modal-avatar-grid .avatar-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function applyProfile(profile) {
+  const el = document.getElementById('settings-avatar');
+  const nm = document.getElementById('settings-name');
+  if (el) el.textContent = profile.avatar || '🧑';
+  if (nm) nm.textContent = profile.name || 'Friend';
+}
+
+function showLoginIfNeeded() {
+  const profile = loadProfile();
+  const overlay = document.getElementById('login-overlay');
+  if (!profile) {
+    selectedLoginAvatar = AVATARS[0];
+    renderAvatarGrid('login-avatar-grid', selectedLoginAvatar, 'pickLoginAvatar');
+  } else {
+    overlay.classList.add('hidden');
+    applyProfile(profile);
+  }
+}
+
+function startJournal() {
+  const nameInput = document.getElementById('login-name-input');
+  const name = (nameInput.value.trim()) || 'Friend';
+  const profile = { name, avatar: selectedLoginAvatar };
+  saveProfile(profile);
+  document.getElementById('login-overlay').classList.add('hidden');
+  applyProfile(profile);
+  refreshHome();
+  showToast('Welcome, ' + name + '! 🎉');
+}
+
+function openProfileModal() {
+  const profile = loadProfile() || { name: 'Friend', avatar: AVATARS[0] };
+  selectedModalAvatar = profile.avatar || AVATARS[0];
+  renderAvatarGrid('modal-avatar-grid', selectedModalAvatar, 'pickModalAvatar');
+  const input = document.getElementById('modal-name-input');
+  if (input) input.value = profile.name || '';
+  document.getElementById('profile-modal').classList.add('show');
+}
+function closeProfileModal() {
+  document.getElementById('profile-modal').classList.remove('show');
+}
+function saveProfileModal() {
+  const name = (document.getElementById('modal-name-input').value.trim()) || 'Friend';
+  const profile = { name, avatar: selectedModalAvatar };
+  saveProfile(profile);
+  applyProfile(profile);
+  closeProfileModal();
+  refreshHome();
+  showToast('Profile updated ✓');
+}
+
+/* ─── Daily Intention ─── */
+function loadIntention() {
+  try {
+    const d = JSON.parse(localStorage.getItem(INTENTION_KEY));
+    return (d && d.date === new Date().toDateString()) ? (d.text || '') : '';
+  } catch { return ''; }
+}
+function saveIntention() {
+  const text = document.getElementById('intention-input').value;
+  localStorage.setItem(INTENTION_KEY, JSON.stringify({ date: new Date().toDateString(), text }));
+}
+function restoreIntention() {
+  const input = document.getElementById('intention-input');
+  if (input) input.value = loadIntention();
+}
+
+/* ─── Mood Chart ─── */
+function renderMoodChart() {
+  const bars = document.getElementById('mood-chart-bars');
+  if (!bars) return;
+  const entries = loadEntries();
+  const now = new Date();
+  const DAY_NAMES = ['S','M','T','W','T','F','S'];
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(now); d.setDate(d.getDate() - (6 - i)); return d;
+  });
+  bars.innerHTML = days.map(day => {
+    const dayStr = day.toDateString();
+    const dayEntries = entries.filter(e => new Date(e.date).toDateString() === dayStr);
+    let mood = null;
+    if (dayEntries.length > 0) {
+      const counts = {};
+      dayEntries.forEach(e => { const m = e.mood || '📝'; counts[m] = (counts[m] || 0) + 1; });
+      mood = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+    }
+    const color = mood ? (MOOD_COLORS[mood] || '#b0b8b0') : 'rgba(200,200,200,0.3)';
+    const barH = mood ? 34 : 5;
+    const isToday = dayStr === now.toDateString();
+    return `<div class="mood-chart-bar-col">
+      ${mood ? `<div class="mood-chart-emoji">${mood}</div>` : '<div style="height:14px"></div>'}
+      <div class="mood-chart-bar" style="height:${barH}px;background:${color};opacity:${isToday ? 1 : 0.72};"></div>
+      <div class="mood-chart-day" style="${isToday ? 'color:var(--accent-dark);font-weight:800' : ''}">${DAY_NAMES[day.getDay()]}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── Favorites ─── */
+function toggleFavorite(id, btn) {
+  const entries = loadEntries();
+  const entry = entries.find(e => e.id === id);
+  if (!entry) return;
+  entry.favorite = !entry.favorite;
+  saveEntries(entries);
+  if (btn) btn.classList.toggle('active', !!entry.favorite);
+  const card = btn && btn.closest('.full-entry-card');
+  if (card) card.classList.toggle('favorited', !!entry.favorite);
+  if (currentScreen === 'home') refreshHome();
+}
+
+/* ─── Edit entry ─── */
+function editCurrentDetail() {
+  if (!detailEntryId) return;
+  const entry = loadEntries().find(e => e.id === detailEntryId);
+  if (!entry) return;
+  editingEntryId = detailEntryId;
+  document.getElementById('entry-input').value = entry.text;
+  document.getElementById('prompt-text').textContent = entry.prompt || prompts[currentPromptIdx];
+  selectedWriteMood = entry.mood || '';
+  document.querySelectorAll('.write-mood-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.mood === selectedWriteMood);
+  });
+  onInput();
+  showScreen('write');
+}
+
 /* ─── Live clock (12-hour format to match iOS status bar style) ─── */
 function updateClock() {
   const now = new Date();
@@ -1120,6 +1478,7 @@ updateClock();
 setInterval(updateClock, 30000);
 
 /* ─── Init ─── */
+showLoginIfNeeded();
 refreshHome();
 </script>
 </body>
