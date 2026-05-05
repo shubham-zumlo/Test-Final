@@ -163,7 +163,11 @@
 
     function loadEntries() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(
+          (e) => e && typeof e.id === 'number' && typeof e.date === 'string' && typeof e.text === 'string'
+        );
       } catch {
         return [];
       }
@@ -221,7 +225,7 @@
 
     function addEntry(text) {
       const entries = loadEntries();
-      entries.push({ id: Date.now(), date: new Date().toISOString(), text });
+      entries.push({ id: Date.now() + Math.floor(Math.random() * 1000), date: new Date().toISOString(), text });
       saveEntries(entries);
       renderEntries();
     }
