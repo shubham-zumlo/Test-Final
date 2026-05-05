@@ -1,539 +1,626 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>My Journal</title>
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-grad: linear-gradient(150deg, #e8cfa0 0%, #ede8dc 22%, #cfddd0 55%, #bfd0c5 100%);
+      --accent: #5ec4a3;
+      --accent-dark: #3da888;
+      --purple: #3d2c5e;
+      --purple-dark: #2e1f4a;
+      --text: #1e1e1e;
+      --muted: #6a7a68;
+      --card: rgba(255,255,255,0.60);
+      --card-border: rgba(255,255,255,0.85);
+      --input-bg: rgba(255,255,255,0.70);
+      --input-border: rgba(255,255,255,0.90);
     }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #d6d6d6;
+      background: #c8c8c8;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 32px 16px;
+      padding: 32px 16px 48px;
+      transition: background 0.4s;
     }
+    body.dark { background: #111; }
 
     /* Phone frame */
     .phone {
       width: 390px;
       min-height: 844px;
-      background: linear-gradient(150deg, #e8cfa0 0%, #ede8dc 22%, #cfddd0 55%, #bfd0c5 100%);
+      background: var(--bg-grad);
       border-radius: 50px;
-      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(255,255,255,0.4);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.32), inset 0 0 0 1.5px rgba(255,255,255,0.5);
       overflow: hidden;
       display: flex;
       flex-direction: column;
       position: relative;
+      transition: background 0.4s;
     }
+
+    /* Dark mode overrides */
+    .phone.dark {
+      --bg-grad: linear-gradient(150deg, #1c1c2e 0%, #16213e 40%, #0f3460 100%);
+      --text: #e0e0e0;
+      --muted: #8a99b0;
+      --card: rgba(255,255,255,0.06);
+      --card-border: rgba(255,255,255,0.12);
+      --input-bg: rgba(255,255,255,0.08);
+      --input-border: rgba(255,255,255,0.14);
+    }
+    .phone.dark .bottom-nav { background: rgba(18,18,38,0.94); border-color: rgba(255,255,255,0.08); }
+    .phone.dark .nav-tab-label { color: #555; }
+    .phone.dark .status-bar { color: #ccc; }
+    .phone.dark .nav-btn-back { background: rgba(255,255,255,0.10); color: #ddd; }
+    .phone.dark #entry-input { color: #ddd; caret-color: #aaa; }
+    .phone.dark .search-box { background: var(--input-bg); border-color: var(--input-border); color: var(--text); }
+    .phone.dark .search-box::placeholder { color: #555; }
+    .phone.dark .settings-row { border-color: rgba(255,255,255,0.06); }
+    .phone.dark .settings-row:hover { background: rgba(255,255,255,0.04); }
+    .phone.dark .modal-sheet { background: #1a1a30; }
+    .phone.dark .modal-title { color: var(--text); }
+    .phone.dark .settings-row-label { color: var(--text); }
+    .phone.dark .modal-close { background: rgba(255,255,255,0.10); color: #ccc; }
+    .phone.dark .auth-input,
+    .phone.dark .login-name-input { background: var(--input-bg); border-color: var(--input-border); color: var(--text); }
+    .phone.dark .auth-input::placeholder { color: #666; }
+    .phone.dark .auth-overlay { background: var(--bg-grad); }
+    .phone.dark .auth-tabs { background: rgba(255,255,255,0.06); }
+    .phone.dark .auth-tab-btn { color: #888; }
+    .phone.dark .auth-tab-btn.active { background: var(--purple); color: #fff; }
+    .phone.dark .filter-pill { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.10); }
+    .phone.dark .tags-input { background: var(--input-bg); border-color: var(--input-border); color: var(--text); }
+    .phone.dark .intention-input { background: var(--input-bg); border-color: var(--input-border); color: var(--text); }
+    .phone.dark .skeleton-line {
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%);
+    }
+    .phone.dark .skeleton-card { background: rgba(255,255,255,0.04); }
+    .phone.dark .full-entry-card.favorited { border-color: rgba(255,200,0,0.28); background: rgba(255,255,200,0.05); }
+    .phone.dark .tag-pill { background: rgba(94,196,163,0.12); }
 
     /* Status bar */
     .status-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 28px 4px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #222;
-      letter-spacing: 0.2px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 28px 4px; font-size: 15px; font-weight: 700; color: #222; flex-shrink: 0;
     }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
 
-    .status-icons {
-      display: flex;
-      gap: 6px;
-      align-items: center;
+    /* Screen container */
+    .screens { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      transform: translateX(30px);
+      overflow-y: auto; overflow-x: hidden;
+      padding-bottom: 72px;
     }
+    .screen::-webkit-scrollbar { display: none; }
+    .screen.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
 
-    /* Nav bar */
-    .nav-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 22px 12px;
+    /* Bottom nav */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 68px;
+      background: rgba(255,255,255,0.82); backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255,255,255,0.9);
+      display: flex; align-items: center; justify-content: space-around;
+      z-index: 100; flex-shrink: 0;
     }
-
-    .nav-btn {
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.15s;
+    .nav-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      border: none; background: none; cursor: pointer; padding: 8px 0; transition: opacity 0.15s;
     }
+    .nav-tab-icon { font-size: 22px; line-height: 1; transition: transform 0.2s; }
+    .nav-tab-label { font-size: 10px; font-weight: 600; color: #aaa; letter-spacing: 0.3px; transition: color 0.2s; }
+    .nav-tab.active .nav-tab-label { color: var(--accent-dark); }
+    .nav-tab.active .nav-tab-icon { transform: scale(1.15); }
+    .nav-tab:active { opacity: 0.7; }
 
-    .nav-btn:active {
-      opacity: 0.7;
-    }
+    /* Home */
+    .home-header { padding: 20px 24px 0; }
+    .home-greeting { font-size: 13px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+    .home-date { font-family: Georgia, serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 18px; }
 
-    .nav-btn-back {
-      width: 44px;
-      height: 44px;
-      background: rgba(255, 255, 255, 0.72);
-      border-radius: 13px;
-      color: #333;
-      font-size: 26px;
-      line-height: 1;
-      padding-bottom: 2px;
-    }
+    .streak-card { margin: 0 24px 16px; background: var(--purple); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; gap: 14px; color: white; }
+    .streak-flame { font-size: 36px; }
+    .streak-num { font-size: 32px; font-weight: 800; line-height: 1; }
+    .streak-label { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+    .streak-right { margin-left: auto; text-align: right; }
+    .streak-best { font-size: 11px; opacity: 0.65; }
+    .streak-best-num { font-size: 18px; font-weight: 700; }
 
-    .nav-btn-save {
-      width: 44px;
-      height: 44px;
-      background: #5ec4a3;
-      border-radius: 50%;
-      color: white;
-      font-size: 20px;
-      font-weight: 700;
-      transition: background 0.2s, opacity 0.2s;
-    }
+    .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; color: var(--muted); padding: 0 24px; margin-bottom: 10px; margin-top: 4px; }
 
-    .nav-btn-save:disabled {
-      background: #9fc9bc;
-      cursor: default;
-      opacity: 0.7;
-    }
+    .mood-row { display: flex; justify-content: space-around; padding: 0 16px; margin-bottom: 16px; }
+    .mood-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; border: none; background: none; cursor: pointer; padding: 8px 10px; border-radius: 14px; transition: background 0.15s, transform 0.2s; }
+    .mood-btn:hover { background: rgba(255,255,255,0.5); }
+    .mood-btn.selected { background: rgba(255,255,255,0.8); transform: scale(1.1); }
+    .mood-btn-icon { font-size: 26px; }
+    .mood-btn-label { font-size: 9px; font-weight: 600; color: var(--muted); }
 
-    /* Content area */
-    .content {
-      flex: 1;
-      padding: 10px 24px 20px;
-      display: flex;
-      flex-direction: column;
-    }
+    .quick-write-btn { margin: 0 24px 18px; background: var(--accent); color: white; border: none; border-radius: 18px; padding: 16px 20px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.2s, transform 0.15s; width: calc(100% - 48px); }
+    .quick-write-btn:hover { background: var(--accent-dark); }
+    .quick-write-btn:active { transform: scale(0.97); }
+    .quick-write-btn-icon { font-size: 22px; }
 
-    .prompt-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 22px;
-    }
+    .recent-entries { padding: 0 24px; }
+    .entry-card { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; border: 1px solid var(--card-border); cursor: pointer; position: relative; transition: background 0.15s, transform 0.15s; }
+    .entry-card:active { transform: scale(0.98); }
+    .entry-card-date { font-size: 10px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+    .entry-card-preview { font-family: Georgia, serif; font-size: 14px; color: var(--text); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .entry-card-mood { position: absolute; top: 12px; right: 14px; font-size: 18px; }
 
-    .prompt-text {
-      flex: 1;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 26px;
-      font-style: italic;
-      color: #1e1e1e;
-      line-height: 1.35;
-    }
+    .stats-row { display: flex; gap: 10px; margin: 0 24px 16px; }
+    .stat-card { flex: 1; background: var(--card); border-radius: 16px; padding: 12px 14px; border: 1px solid var(--card-border); text-align: center; }
+    .stat-num { font-size: 24px; font-weight: 800; color: var(--text); }
+    .stat-label { font-size: 10px; color: var(--muted); font-weight: 600; margin-top: 2px; }
 
-    .edit-icon {
-      width: 32px;
-      height: 32px;
-      background: rgba(255, 255, 255, 0.65);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      margin-top: 4px;
-      flex-shrink: 0;
-      cursor: pointer;
-      border: none;
-      transition: background 0.15s;
-    }
+    /* Write screen */
+    .write-nav { display: flex; justify-content: space-between; align-items: center; padding: 8px 22px 10px; flex-shrink: 0; }
+    .nav-btn { border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.15s; }
+    .nav-btn:active { opacity: 0.7; }
+    .nav-btn-back { width: 44px; height: 44px; background: rgba(255,255,255,0.72); border-radius: 13px; color: #333; font-size: 26px; padding-bottom: 2px; }
+    .nav-btn-save { width: 44px; height: 44px; background: var(--accent); border-radius: 50%; color: white; font-size: 20px; font-weight: 700; transition: background 0.2s, opacity 0.2s; }
+    .nav-btn-save:disabled { background: #9fc9bc; cursor: default; opacity: 0.7; }
 
-    .edit-icon:hover {
-      background: rgba(255, 255, 255, 0.9);
-    }
+    .write-content { flex: 1; padding: 0 24px 10px; display: flex; flex-direction: column; }
+    .prompt-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; }
+    .prompt-text { flex: 1; font-family: Georgia, serif; font-size: 24px; font-style: italic; color: var(--text); line-height: 1.35; }
+    .edit-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.65); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; margin-top: 4px; flex-shrink: 0; cursor: pointer; border: none; transition: background 0.15s; }
+    .edit-icon:hover { background: rgba(255,255,255,0.9); }
 
-    .action-pills {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 22px;
-      flex-wrap: wrap;
-    }
+    .action-pills { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .pill { background: var(--purple); color: white; border: none; border-radius: 24px; padding: 8px 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
+    .pill:hover { background: var(--purple-dark); }
+    .pill:active { background: #1e1235; }
 
-    .pill {
-      background: #3d2c5e;
-      color: white;
-      border: none;
-      border-radius: 24px;
-      padding: 9px 18px;
-      font-size: 13px;
-      font-family: 'Segoe UI', sans-serif;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s;
-    }
+    #entry-input { width: 100%; min-height: 180px; background: transparent; border: none; outline: none; resize: none; font-family: Georgia, serif; font-size: 16px; font-style: italic; color: #333; line-height: 1.7; caret-color: #555; }
+    #entry-input::placeholder { color: #a0aa9a; font-style: italic; }
+    .word-count { font-size: 11px; color: var(--muted); text-align: right; margin-top: 6px; margin-bottom: 10px; }
 
-    .pill:hover {
-      background: #2e1f4a;
-    }
+    .write-mood-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+    .write-mood-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .write-mood-btn { font-size: 22px; background: none; border: 2px solid transparent; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s, transform 0.2s; }
+    .write-mood-btn.selected { border-color: var(--accent); transform: scale(1.2); }
 
-    .pill:active {
-      background: #1e1235;
-    }
+    /* Tags */
+    .tags-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .tags-wrap-label { font-size: 16px; }
+    .tags-input { flex: 1; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.8); border-radius: 12px; padding: 8px 12px; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s, background 0.2s; }
+    .tags-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.85); }
+    .tags-input::placeholder { color: var(--muted); }
 
-    /* Writing area */
-    .writing-area {
-      flex: 1;
-    }
+    .entry-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .tag-pill { background: rgba(94,196,163,0.18); color: var(--accent-dark); border-radius: 8px; padding: 2px 8px; font-size: 10px; font-weight: 700; }
 
-    #entry-input {
-      width: 100%;
-      min-height: 220px;
-      background: transparent;
-      border: none;
-      outline: none;
-      resize: none;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 16px;
-      font-style: italic;
-      color: #333;
-      line-height: 1.7;
-      caret-color: #555;
-    }
+    /* Entries */
+    .entries-header { padding: 14px 24px 0; flex-shrink: 0; }
+    .entries-screen-title { font-family: Georgia, serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+    .search-box { width: 100%; background: rgba(255,255,255,0.7); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 14px; padding: 10px 14px; font-size: 14px; color: var(--text); outline: none; margin-bottom: 14px; }
+    .search-box::placeholder { color: #aaa; }
+    .filter-pills { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .filter-pill { background: rgba(255,255,255,0.5); border: 1.5px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--muted); cursor: pointer; font-weight: 600; transition: background 0.15s; }
+    .filter-pill.active { background: var(--purple); color: white; border-color: var(--purple); }
+    .entries-list-area { padding: 0 24px; }
 
-    #entry-input::placeholder {
-      color: #a0aa9a;
-      font-style: italic;
-    }
+    .full-entry-card { background: var(--card); border-radius: 16px; padding: 14px 44px 14px 16px; margin-bottom: 10px; border: 1px solid var(--card-border); cursor: pointer; position: relative; transition: background 0.15s, transform 0.15s; }
+    .full-entry-card:active { transform: scale(0.98); }
+    .full-entry-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .full-entry-card-date { font-size: 10px; color: var(--muted); font-weight: 600; }
+    .full-entry-card-mood { font-size: 16px; }
+    .full-entry-card-text { font-family: Georgia, serif; font-size: 14px; color: var(--text); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .entry-delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #bbb; font-size: 14px; cursor: pointer; padding: 4px; transition: color 0.15s; }
+    .entry-delete-btn:hover { color: #e63946; }
 
-    /* Entries panel */
-    .entries-panel {
-      background: rgba(255, 255, 255, 0.28);
-      border-radius: 24px 24px 0 0;
-      padding: 18px 20px 20px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
+    .fav-btn { position: absolute; top: 10px; right: 30px; background: none; border: none; font-size: 15px; cursor: pointer; padding: 4px; opacity: 0.3; transition: opacity 0.15s, transform 0.2s; line-height: 1; }
+    .fav-btn.active { opacity: 1; transform: scale(1.2); }
+    .full-entry-card.favorited { border-color: rgba(255,200,0,0.50); background: rgba(255,255,230,0.65); }
 
-    .entries-panel::-webkit-scrollbar {
-      width: 4px;
-    }
+    /* Empty state */
+    .empty-state { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; gap: 10px; }
+    .empty-state-icon { font-size: 40px; opacity: 0.5; }
+    .empty-state-text { font-size: 14px; color: var(--muted); font-style: italic; text-align: center; }
 
-    .entries-panel::-webkit-scrollbar-thumb {
-      background: rgba(0,0,0,0.15);
-      border-radius: 4px;
-    }
+    /* Skeleton */
+    .skeleton-card { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; border: 1px solid var(--card-border); }
+    .skeleton-line { height: 12px; border-radius: 6px; margin-bottom: 8px; background: linear-gradient(90deg, rgba(180,180,180,0.25) 25%, rgba(200,200,200,0.45) 50%, rgba(180,180,180,0.25) 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite; }
+    .skeleton-line.short  { width: 38%; }
+    .skeleton-line.medium { width: 68%; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
 
-    .entries-title {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: #6a7a68;
-      margin-bottom: 14px;
-    }
+    /* Settings */
+    .settings-header { padding: 20px 24px 14px; }
+    .settings-title { font-family: Georgia, serif; font-size: 26px; font-weight: 700; color: var(--text); }
+    .settings-section { margin: 0 24px 18px; }
+    .settings-section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .settings-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 18px; overflow: hidden; }
+    .settings-row { display: flex; align-items: center; padding: 14px 16px; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.5); cursor: pointer; transition: background 0.15s; }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row:hover { background: rgba(255,255,255,0.3); }
+    .settings-row-icon { font-size: 20px; width: 28px; text-align: center; }
+    .settings-row-label { flex: 1; font-size: 15px; color: var(--text); font-weight: 500; }
+    .settings-row-value { font-size: 13px; color: var(--muted); }
+    .settings-row-arrow { font-size: 14px; color: #ccc; }
+    .toggle { width: 44px; height: 26px; background: #ccc; border-radius: 13px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; border: none; }
+    .toggle.on { background: var(--accent); }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .toggle.on::after { left: 21px; }
 
-    #entries-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    /* Profile banner */
+    .profile-banner { margin: 0 24px 20px; background: var(--purple); border-radius: 20px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: background 0.15s; }
+    .profile-banner:hover { background: var(--purple-dark); }
+    .profile-avatar-big { font-size: 42px; }
+    .profile-name-big { font-family: Georgia, serif; font-size: 18px; font-weight: 700; color: white; }
+    .profile-edit-hint { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+    .settings-email { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+    .profile-banner-arrow { margin-left: auto; color: rgba(255,255,255,0.40); font-size: 20px; }
 
-    .entry {
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 14px;
-      padding: 14px 38px 14px 14px;
-      position: relative;
-    }
+    /* Detail */
+    .detail-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 22px 8px; }
+    .detail-content { padding: 0 24px; }
+    .detail-date { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+    .detail-mood { font-size: 28px; margin-bottom: 14px; }
+    .detail-text { font-family: Georgia, serif; font-size: 16px; color: var(--text); line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 14px; }
+    .detail-wordcount { font-size: 11px; color: var(--muted); margin-top: 10px; }
 
-    .entry-date {
-      font-size: 11px;
-      color: #8a9488;
-      margin-bottom: 5px;
-      font-family: 'Segoe UI', sans-serif;
-    }
+    /* Toast */
+    .toast { position: absolute; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: rgba(30,30,30,0.88); color: white; border-radius: 20px; padding: 8px 18px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 200; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .entry-text {
-      font-size: 14px;
-      color: #2e2e2e;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: Georgia, serif;
-    }
+    /* Shared modal */
+    .modal-overlay { position: absolute; inset: 0; z-index: 400; background: rgba(0,0,0,0.38); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal-sheet { background: #f3ede3; border-radius: 28px 28px 0 0; padding: 20px 24px 36px; width: 100%; display: flex; flex-direction: column; gap: 14px; transform: translateY(20px); transition: transform 0.25s; }
+    .modal-overlay.show .modal-sheet { transform: translateY(0); }
+    .modal-header { display: flex; align-items: center; gap: 10px; }
+    .modal-title { font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: var(--text); }
+    .modal-close { margin-left: auto; background: rgba(0,0,0,0.08); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-save-btn { background: var(--accent); color: white; border: none; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; transition: background 0.15s; }
+    .modal-save-btn:hover { background: var(--accent-dark); }
+    .export-btn { background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 18px; font-size: 15px; font-weight: 600; color: var(--text); cursor: pointer; text-align: left; transition: background 0.15s, transform 0.1s; display: flex; align-items: center; gap: 10px; }
+    .export-btn:hover { background: rgba(255,255,255,0.9); }
+    .export-btn:active { transform: scale(0.98); }
 
-    .entry-delete {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      color: #bbb;
-      font-size: 13px;
-      cursor: pointer;
-      padding: 4px;
-      width: auto;
-      margin: 0;
-      line-height: 1;
-      transition: color 0.15s;
-    }
+    /* Avatar grid */
+    .avatar-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 4px; }
+    .avatar-btn { font-size: 28px; width: 48px; height: 48px; background: rgba(255,255,255,0.5); border: 2.5px solid transparent; border-radius: 14px; cursor: pointer; transition: transform 0.15s, border-color 0.15s, background 0.15s; display: flex; align-items: center; justify-content: center; }
+    .avatar-btn.selected { border-color: var(--accent); background: rgba(255,255,255,0.9); transform: scale(1.08); }
 
-    .entry-delete:hover {
-      color: #e63946;
-      background: none;
-    }
+    .login-field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); align-self: flex-start; }
+    .login-name-input { width: 100%; background: rgba(255,255,255,0.7); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 14px; padding: 13px 16px; font-size: 16px; color: var(--text); outline: none; transition: border-color 0.2s, background 0.2s; }
+    .login-name-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.92); }
 
-    .empty-state {
-      text-align: center;
-      color: #a0aa9a;
-      font-size: 13px;
-      padding: 10px 0 4px;
-      font-style: italic;
-    }
+    /* Auth screen */
+    .auth-overlay { position: absolute; inset: 0; z-index: 500; background: var(--bg-grad); display: flex; align-items: flex-start; justify-content: center; padding: 44px 28px 32px; overflow-y: auto; transition: opacity 0.35s ease; }
+    .auth-overlay.hidden { opacity: 0; pointer-events: none; }
+    .auth-box { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; max-width: 320px; }
+    .auth-logo { font-size: 56px; }
+    .auth-app-name { font-family: Georgia, serif; font-size: 26px; font-weight: 700; color: var(--text); margin-top: -6px; }
+    .auth-tagline { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; }
+    .auth-tabs { display: flex; width: 100%; background: rgba(255,255,255,0.4); border-radius: 14px; padding: 4px; gap: 4px; }
+    .auth-tab-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; background: transparent; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .auth-tab-btn.active { background: white; color: var(--purple); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .auth-form { display: none; flex-direction: column; gap: 10px; width: 100%; }
+    .auth-form.active { display: flex; }
+    .auth-input { width: 100%; background: rgba(255,255,255,0.7); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 14px; padding: 13px 16px; font-size: 15px; color: var(--text); outline: none; transition: border-color 0.2s, background 0.2s; }
+    .auth-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.92); }
+    .auth-input::placeholder { color: #a0aa9a; }
+    .auth-submit-btn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 18px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 4px; }
+    .auth-submit-btn:hover { background: var(--accent-dark); }
+    .auth-submit-btn:active { transform: scale(0.98); }
+    .auth-error { display: none; font-size: 12px; color: #e63946; font-weight: 600; background: rgba(230,57,70,0.08); border-radius: 10px; padding: 8px 12px; text-align: center; }
 
-    /* Responsive: full-screen on real mobile */
+    /* Daily intention */
+    .intention-wrap { margin: 0 24px 14px; }
+    .intention-input { width: 100%; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8); border-radius: 14px; padding: 11px 16px; font-size: 14px; color: var(--text); outline: none; font-style: italic; transition: border-color 0.2s, background 0.2s; }
+    .intention-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.85); }
+    .intention-input::placeholder { color: var(--muted); }
+
+    /* Mood chart */
+    .mood-chart-wrap { margin: 0 24px 16px; background: var(--card); border: 1px solid var(--card-border); border-radius: 18px; padding: 12px 14px 10px; }
+    .mood-chart-bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 4px; height: 56px; margin-bottom: 4px; }
+    .mood-chart-bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+    .mood-chart-bar { width: 100%; border-radius: 5px 5px 2px 2px; min-height: 4px; transition: height 0.4s ease; }
+    .mood-chart-day { font-size: 9px; font-weight: 600; color: var(--muted); text-align: center; }
+    .mood-chart-emoji { font-size: 13px; line-height: 1; }
+
     @media (max-width: 430px) {
-      body {
-        padding: 0;
-        background: linear-gradient(150deg, #e8cfa0 0%, #ede8dc 22%, #cfddd0 55%, #bfd0c5 100%);
-      }
-      .phone {
-        width: 100%;
-        min-height: 100vh;
-        border-radius: 0;
-        box-shadow: none;
-      }
+      body { padding: 0; background: var(--bg-grad); }
+      .phone { width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; }
     }
   </style>
 </head>
 <body>
-  <div class="phone">
-    <!-- Status bar -->
-    <div class="status-bar">
-      <span>9:41</span>
-      <div class="status-icons">
-        <!-- Signal bars -->
-        <svg width="18" height="13" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="7" width="3" height="6" rx="1" fill="#222"/>
-          <rect x="4.5" y="4.5" width="3" height="8.5" rx="1" fill="#222"/>
-          <rect x="9" y="2" width="3" height="11" rx="1" fill="#222"/>
-          <rect x="13.5" y="0" width="3" height="13" rx="1" fill="#222" opacity="0.28"/>
-        </svg>
-        <!-- Wi-Fi -->
-        <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#222"/>
-          <path d="M3.76 7.24A6 6 0 0 1 8 5.5a6 6 0 0 1 4.24 1.74l1.42-1.42A8 8 0 0 0 8 3.5a8 8 0 0 0-5.66 2.32l1.42 1.42z" fill="#222"/>
-          <path d="M8 .5a11.95 11.95 0 0 0-8.49 3.51l1.42 1.42A10 10 0 0 1 8 2.5a10 10 0 0 1 7.07 2.93l1.42-1.42A11.95 11.95 0 0 0 8 .5z" fill="#222"/>
-        </svg>
-        <!-- Battery -->
-        <svg width="26" height="13" viewBox="0 0 26 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0.5" y="1.5" width="22" height="10" rx="2.5" stroke="#222" stroke-width="1"/>
-          <rect x="23" y="4" width="2.5" height="5" rx="1.25" fill="#222"/>
-          <rect x="1.5" y="2.5" width="19" height="8" rx="2" fill="#222"/>
-        </svg>
+<div class="phone" id="phone">
+
+  <!-- AUTH OVERLAY -->
+  <div id="auth-overlay" class="auth-overlay">
+    <div class="auth-box">
+      <div class="auth-logo">&#x1F4D3;</div>
+      <div class="auth-app-name">My Journal</div>
+      <div class="auth-tagline">Your private space for thoughts,<br>gratitude &amp; reflection.</div>
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" data-tab="login"  onclick="switchAuthTab('login')">Log In</button>
+        <button class="auth-tab-btn"        data-tab="signup" onclick="switchAuthTab('signup')">Sign Up</button>
       </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="nav-bar">
-      <button class="nav-btn nav-btn-back" id="back-btn" title="Discard entry">&#8249;</button>
-      <button class="nav-btn nav-btn-save" id="save-btn" disabled title="Save entry">✓</button>
-    </div>
-
-    <!-- Main content -->
-    <div class="content">
-      <div class="prompt-row">
-        <span class="prompt-text" id="prompt-text">What quietly took care of you today?</span>
-        <button class="edit-icon" id="edit-prompt-btn" title="Edit prompt">✏️</button>
-      </div>
-
-      <div class="action-pills">
-        <button class="pill" id="new-prompt-btn">🔄 New prompt</button>
-        <button class="pill" id="help-btn">💡 Help me to write</button>
-      </div>
-
-      <div class="writing-area">
-        <textarea id="entry-input" placeholder="Start writing"></textarea>
-      </div>
-    </div>
-
-    <!-- Previous entries -->
-    <div class="entries-panel">
-      <p class="entries-title">Previous Entries</p>
-      <div id="entries-list"></div>
+      <form class="auth-form active" id="auth-login" onsubmit="return false;">
+        <input id="login-email"    class="auth-input" type="email"    autocomplete="email"           placeholder="Email address" required />
+        <input id="login-password" class="auth-input" type="password" autocomplete="current-password" placeholder="Password" required />
+        <div class="auth-error" id="auth-login-error"></div>
+        <button type="submit" class="auth-submit-btn">Log In &#x2192;</button>
+      </form>
+      <form class="auth-form" id="auth-signup" onsubmit="return false;">
+        <input id="signup-email"    class="auth-input" type="email"    autocomplete="email"       placeholder="Email address" required />
+        <input id="signup-password" class="auth-input" type="password" autocomplete="new-password" placeholder="Password (min 6 chars)" required />
+        <input id="signup-name"     class="auth-input" type="text"     autocomplete="name"        placeholder="Your name (optional)" maxlength="30" />
+        <div class="login-field-label" style="margin-top:4px;">Pick your avatar</div>
+        <div class="avatar-grid" id="signup-avatar-grid"></div>
+        <div class="auth-error" id="auth-signup-error"></div>
+        <button type="submit" class="auth-submit-btn">Create Account &#x2728;</button>
+      </form>
     </div>
   </div>
 
-  <script>
-    const textarea = document.getElementById('entry-input');
-    const saveBtn = document.getElementById('save-btn');
-    const entriesList = document.getElementById('entries-list');
-    const promptTextEl = document.getElementById('prompt-text');
+  <!-- PROFILE EDIT MODAL -->
+  <div id="profile-modal" class="modal-overlay" onclick="if(event.target===this)closeProfileModal()">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">Edit Profile</div>
+        <button class="modal-close" onclick="closeProfileModal()">&#x2715;</button>
+      </div>
+      <div class="login-field-label">Avatar</div>
+      <div class="avatar-grid" id="modal-avatar-grid"></div>
+      <div class="login-field-label">Name</div>
+      <input id="modal-name-input" class="login-name-input" type="text" maxlength="30" placeholder="Your name&#x2026;"
+             onkeydown="if(event.key==='Enter')saveProfileModal()" />
+      <button class="modal-save-btn" onclick="saveProfileModal()">Save Changes</button>
+    </div>
+  </div>
 
-    const STORAGE_KEY = 'journal_entries';
+  <!-- EXPORT MODAL -->
+  <div id="export-modal" class="modal-overlay" onclick="if(event.target===this)closeExportModal()">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">Export Entries</div>
+        <button class="modal-close" onclick="closeExportModal()">&#x2715;</button>
+      </div>
+      <button class="export-btn" onclick="exportAsTxt()">&#x1F4C4; Export as .txt</button>
+      <button class="export-btn" onclick="exportAsJson()">&#x1F4CB; Export as JSON</button>
+    </div>
+  </div>
 
-    const prompts = [
-      'What quietly took care of you today?',
-      'What are you grateful for right now?',
-      'What made you smile today?',
-      'What would you like to let go of today?',
-      'What is something you learned today?',
-      'What moment do you want to remember?',
-      'How did you show kindness today?',
-      'What challenged you and how did you grow?',
-    ];
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span id="status-time">9:41</span>
+    <div class="status-icons">
+      <svg width="18" height="13" viewBox="0 0 18 13" fill="none"><rect x="0" y="7" width="3" height="6" rx="1" fill="#222"/><rect x="4.5" y="4.5" width="3" height="8.5" rx="1" fill="#222"/><rect x="9" y="2" width="3" height="11" rx="1" fill="#222"/><rect x="13.5" y="0" width="3" height="13" rx="1" fill="#222" opacity="0.28"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#222"/><path d="M3.76 7.24A6 6 0 0 1 8 5.5a6 6 0 0 1 4.24 1.74l1.42-1.42A8 8 0 0 0 8 3.5a8 8 0 0 0-5.66 2.32l1.42 1.42z" fill="#222"/><path d="M8 .5a11.95 11.95 0 0 0-8.49 3.51l1.42 1.42A10 10 0 0 1 8 2.5a10 10 0 0 1 7.07 2.93l1.42-1.42A11.95 11.95 0 0 0 8 .5z" fill="#222"/></svg>
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="1.5" width="22" height="10" rx="2.5" stroke="#222" stroke-width="1"/><rect x="23" y="4" width="2.5" height="5" rx="1.25" fill="#222"/><rect x="1.5" y="2.5" width="19" height="8" rx="2" fill="#222"/></svg>
+    </div>
+  </div>
 
-    let currentPromptIndex = 0;
+  <!-- Screens -->
+  <div class="screens">
 
-    document.getElementById('new-prompt-btn').addEventListener('click', () => {
-      currentPromptIndex = (currentPromptIndex + 1) % prompts.length;
-      promptTextEl.textContent = prompts[currentPromptIndex];
-    });
+    <!-- HOME -->
+    <div class="screen active" id="screen-home">
+      <div class="home-header">
+        <div class="home-greeting" id="home-greeting">Good morning</div>
+        <div class="home-date" id="home-date">Monday, May 5</div>
+      </div>
+      <div class="intention-wrap">
+        <input id="intention-input" class="intention-input" type="text" maxlength="80"
+               placeholder="&#x2728; Set today&#x27;s intention&#x2026;" oninput="saveIntention()" />
+      </div>
+      <div class="streak-card">
+        <div class="streak-flame">&#x1F525;</div>
+        <div>
+          <div class="streak-num" id="streak-count">0</div>
+          <div class="streak-label">Day streak</div>
+        </div>
+        <div class="streak-right">
+          <div class="streak-best">Best streak</div>
+          <div class="streak-best-num" id="best-streak">0</div>
+        </div>
+      </div>
+      <div class="section-title" style="margin-top:8px;">7-Day Mood</div>
+      <div class="mood-chart-wrap">
+        <div class="mood-chart-bars" id="mood-chart-bars"></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num" id="total-entries">0</div><div class="stat-label">Total Entries</div></div>
+        <div class="stat-card"><div class="stat-num" id="total-words">0</div><div class="stat-label">Words Written</div></div>
+        <div class="stat-card"><div class="stat-num" id="this-week">0</div><div class="stat-label">This Week</div></div>
+      </div>
+      <div class="section-title">How are you feeling?</div>
+      <div class="mood-row" id="home-mood-row">
+        <button class="mood-btn" data-mood="&#x1F604;" onclick="setHomeMood('&#x1F604;',this)"><span class="mood-btn-icon">&#x1F604;</span><span class="mood-btn-label">Great</span></button>
+        <button class="mood-btn" data-mood="&#x1F642;" onclick="setHomeMood('&#x1F642;',this)"><span class="mood-btn-icon">&#x1F642;</span><span class="mood-btn-label">Good</span></button>
+        <button class="mood-btn" data-mood="&#x1F610;" onclick="setHomeMood('&#x1F610;',this)"><span class="mood-btn-icon">&#x1F610;</span><span class="mood-btn-label">Okay</span></button>
+        <button class="mood-btn" data-mood="&#x1F614;" onclick="setHomeMood('&#x1F614;',this)"><span class="mood-btn-icon">&#x1F614;</span><span class="mood-btn-label">Low</span></button>
+        <button class="mood-btn" data-mood="&#x1F624;" onclick="setHomeMood('&#x1F624;',this)"><span class="mood-btn-icon">&#x1F624;</span><span class="mood-btn-label">Stressed</span></button>
+      </div>
+      <button class="quick-write-btn" onclick="goWrite()">
+        <span class="quick-write-btn-icon">&#x270D;&#xFE0F;</span>
+        <span>Write Today&#x27;s Entry</span>
+      </button>
+      <div class="section-title">Recent Entries</div>
+      <div class="recent-entries" id="home-recent"></div>
+    </div>
 
-    document.getElementById('help-btn').addEventListener('click', () => {
-      const starters = [
-        'Today I noticed…',
-        'Something that surprised me was…',
-        'I felt grateful when…',
-        'A small joy today was…',
-        'I'm thinking about…',
-      ];
-      if (!textarea.value.trim()) {
-        textarea.value = starters[Math.floor(Math.random() * starters.length)];
-        textarea.dispatchEvent(new Event('input'));
-      }
-      textarea.focus();
-    });
+    <!-- WRITE -->
+    <div class="screen" id="screen-write">
+      <div class="write-nav">
+        <button class="nav-btn nav-btn-back" onclick="goHome()">&#x2039;</button>
+        <button class="nav-btn nav-btn-save" id="save-btn" disabled onclick="saveEntry()">&#x2713;</button>
+      </div>
+      <div class="write-content">
+        <div class="prompt-row">
+          <span class="prompt-text" id="prompt-text">What quietly took care of you today?</span>
+          <button class="edit-icon" onclick="editPrompt()" title="Edit prompt">&#x270F;&#xFE0F;</button>
+        </div>
+        <div class="action-pills">
+          <button class="pill" onclick="nextPrompt()">&#x1F504; New prompt</button>
+          <button class="pill" onclick="helpWrite()">&#x1F4A1; Help me write</button>
+        </div>
+        <div class="write-mood-row">
+          <span class="write-mood-label">Mood:</span>
+          <button class="write-mood-btn" data-mood="&#x1F604;" onclick="setWriteMood('&#x1F604;',this)">&#x1F604;</button>
+          <button class="write-mood-btn" data-mood="&#x1F642;" onclick="setWriteMood('&#x1F642;',this)">&#x1F642;</button>
+          <button class="write-mood-btn" data-mood="&#x1F610;" onclick="setWriteMood('&#x1F610;',this)">&#x1F610;</button>
+          <button class="write-mood-btn" data-mood="&#x1F614;" onclick="setWriteMood('&#x1F614;',this)">&#x1F614;</button>
+          <button class="write-mood-btn" data-mood="&#x1F624;" onclick="setWriteMood('&#x1F624;',this)">&#x1F624;</button>
+        </div>
+        <div class="tags-wrap">
+          <span class="tags-wrap-label">&#x1F3F7;&#xFE0F;</span>
+          <input id="tags-input" class="tags-input" type="text"
+                 placeholder="Tags: gratitude, work, mindfulness&#x2026;" maxlength="120" />
+        </div>
+        <textarea id="entry-input" placeholder="Start writing&#x2026;" oninput="onInput()"></textarea>
+        <div class="word-count" id="word-count">0 words</div>
+      </div>
+    </div>
 
-    document.getElementById('edit-prompt-btn').addEventListener('click', () => {
-      const custom = window.prompt('Enter your own prompt:', promptTextEl.textContent);
-      if (custom && custom.trim()) {
-        promptTextEl.textContent = custom.trim();
-      }
-    });
+    <!-- ENTRIES -->
+    <div class="screen" id="screen-entries">
+      <div class="entries-header">
+        <div class="entries-screen-title">My Entries</div>
+        <input class="search-box" type="text" placeholder="&#x1F50D;  Search&#x2026; or #tag"
+               id="search-input" oninput="renderEntriesList()" />
+        <div class="filter-pills">
+          <button class="filter-pill active" onclick="setFilter('all',this)">All</button>
+          <button class="filter-pill" onclick="setFilter('&#x1F604;',this)">&#x1F604; Great</button>
+          <button class="filter-pill" onclick="setFilter('&#x1F642;',this)">&#x1F642; Good</button>
+          <button class="filter-pill" onclick="setFilter('&#x1F610;',this)">&#x1F610; Okay</button>
+          <button class="filter-pill" onclick="setFilter('&#x1F614;',this)">&#x1F614; Low</button>
+          <button class="filter-pill" onclick="setFilter('&#x1F624;',this)">&#x1F624; Stressed</button>
+          <button class="filter-pill" onclick="setFilter('starred',this)">&#x2B50; Starred</button>
+        </div>
+      </div>
+      <div class="entries-list-area" id="entries-list-area"></div>
+    </div>
 
-    document.getElementById('back-btn').addEventListener('click', () => {
-      if (!textarea.value.trim() || window.confirm('Discard this entry?')) {
-        textarea.value = '';
-        saveBtn.disabled = true;
-      }
-    });
+    <!-- SETTINGS -->
+    <div class="screen" id="screen-settings">
+      <div class="settings-header">
+        <div class="settings-title">Settings</div>
+      </div>
+      <div class="profile-banner" onclick="openProfileModal()">
+        <div class="profile-avatar-big" id="settings-avatar">&#x1F9D1;</div>
+        <div>
+          <div class="profile-name-big" id="settings-name">Friend</div>
+          <div class="settings-email"   id="settings-email"></div>
+          <div class="profile-edit-hint">Tap to edit profile</div>
+        </div>
+        <div class="profile-banner-arrow">&#x203A;</div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Preferences</div>
+        <div class="settings-card">
+          <div class="settings-row" onclick="toggleReminders()">
+            <span class="settings-row-icon">&#x1F514;</span>
+            <span class="settings-row-label">Daily Reminders</span>
+            <button class="toggle" id="toggle-reminders" onclick="event.stopPropagation();toggleReminders()"></button>
+          </div>
+          <div class="settings-row" onclick="toggleDarkMode()">
+            <span class="settings-row-icon">&#x1F319;</span>
+            <span class="settings-row-label">Dark Mode</span>
+            <button class="toggle" id="toggle-dark" onclick="event.stopPropagation();toggleDarkMode()"></button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Data</div>
+        <div class="settings-card">
+          <div class="settings-row" onclick="openExportModal()">
+            <span class="settings-row-icon">&#x1F4E4;</span>
+            <span class="settings-row-label">Export Entries</span>
+            <span class="settings-row-arrow">&#x203A;</span>
+          </div>
+          <div class="settings-row" onclick="clearData()">
+            <span class="settings-row-icon">&#x1F5D1;&#xFE0F;</span>
+            <span class="settings-row-label" style="color:#e63946;">Clear All Data</span>
+            <span class="settings-row-arrow">&#x203A;</span>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-card">
+          <div class="settings-row" onclick="handleLogOut()">
+            <span class="settings-row-icon">&#x1F6AA;</span>
+            <span class="settings-row-label" style="color:#e63946;">Log Out</span>
+            <span class="settings-row-arrow">&#x203A;</span>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">About</div>
+        <div class="settings-card">
+          <div class="settings-row">
+            <span class="settings-row-icon">&#x1F4D3;</span>
+            <span class="settings-row-label">My Journal</span>
+            <span class="settings-row-value">v3.0</span>
+          </div>
+          <div class="settings-row">
+            <span class="settings-row-icon">&#x2764;&#xFE0F;</span>
+            <span class="settings-row-label">Made with love</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    function loadEntries() {
-      try {
-        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (!Array.isArray(parsed)) return [];
-        return parsed.filter(
-          (e) => e && typeof e.id === 'number' && typeof e.date === 'string' && typeof e.text === 'string'
-        );
-      } catch {
-        return [];
-      }
-    }
+    <!-- DETAIL -->
+    <div class="screen" id="screen-detail">
+      <div class="detail-nav">
+        <button class="nav-btn nav-btn-back" onclick="closeDetail()">&#x2039;</button>
+        <div style="display:flex;gap:8px;">
+          <button class="nav-btn nav-btn-back" onclick="editCurrentDetail()" style="font-size:18px;" title="Edit">&#x270F;&#xFE0F;</button>
+          <button class="nav-btn nav-btn-back" onclick="deleteCurrentDetail()" style="font-size:18px;color:#e63946;" title="Delete">&#x1F5D1;&#xFE0F;</button>
+        </div>
+      </div>
+      <div class="detail-content">
+        <div class="detail-date"      id="detail-date"></div>
+        <div class="detail-mood"      id="detail-mood"></div>
+        <div class="detail-text"      id="detail-text"></div>
+        <div class="detail-tags"      id="detail-tags"></div>
+        <div class="detail-wordcount" id="detail-wordcount"></div>
+      </div>
+    </div>
 
-    function saveEntries(entries) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-    }
+  </div><!-- /screens -->
 
-    function formatDate(iso) {
-      const d = new Date(iso);
-      return d.toLocaleString(undefined, {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    }
+  <!-- Bottom nav -->
+  <div class="bottom-nav" id="bottom-nav">
+    <button class="nav-tab active" id="tab-home"     onclick="showScreen('home')">
+      <span class="nav-tab-icon">&#x1F3E0;</span><span class="nav-tab-label">Home</span>
+    </button>
+    <button class="nav-tab" id="tab-write"           onclick="showScreen('write')">
+      <span class="nav-tab-icon">&#x270D;&#xFE0F;</span><span class="nav-tab-label">Write</span>
+    </button>
+    <button class="nav-tab" id="tab-entries"         onclick="showScreen('entries')">
+      <span class="nav-tab-icon">&#x1F4D6;</span><span class="nav-tab-label">Entries</span>
+    </button>
+    <button class="nav-tab" id="tab-settings"        onclick="showScreen('settings')">
+      <span class="nav-tab-icon">&#x2699;&#xFE0F;</span><span class="nav-tab-label">Settings</span>
+    </button>
+  </div>
 
-    function renderEntries() {
-      const entries = loadEntries();
-      entriesList.innerHTML = '';
+  <div class="toast" id="toast"></div>
 
-      if (entries.length === 0) {
-        entriesList.innerHTML = '<p class="empty-state">No entries yet. Start writing above!</p>';
-        return;
-      }
+</div><!-- /phone -->
 
-      entries.slice().reverse().forEach((entry) => {
-        const article = document.createElement('article');
-        article.className = 'entry';
-
-        const dateEl = document.createElement('p');
-        dateEl.className = 'entry-date';
-        dateEl.textContent = formatDate(entry.date);
-
-        const textEl = document.createElement('p');
-        textEl.className = 'entry-text';
-        textEl.textContent = entry.text;
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'entry-delete';
-        deleteBtn.title = 'Delete entry';
-        deleteBtn.textContent = '✕';
-        deleteBtn.addEventListener('click', () => deleteEntry(entry.id));
-
-        article.appendChild(dateEl);
-        article.appendChild(textEl);
-        article.appendChild(deleteBtn);
-        entriesList.appendChild(article);
-      });
-    }
-
-    function addEntry(text) {
-      const entries = loadEntries();
-      entries.push({ id: Date.now() + Math.floor(Math.random() * 1000), date: new Date().toISOString(), text });
-      saveEntries(entries);
-      renderEntries();
-    }
-
-    function deleteEntry(id) {
-      const entries = loadEntries().filter((e) => e.id !== id);
-      saveEntries(entries);
-      renderEntries();
-    }
-
-    textarea.addEventListener('input', () => {
-      saveBtn.disabled = textarea.value.trim() === '';
-    });
-
-    saveBtn.addEventListener('click', () => {
-      const text = textarea.value.trim();
-      if (!text) return;
-      addEntry(text);
-      textarea.value = '';
-      saveBtn.disabled = true;
-      textarea.focus();
-    });
-
-    renderEntries();
-  </script>
-</body>
-</html>
-
-<html>
-<head>
-  <title>Daily Journal</title>
-  <style>
-    body { font-family: Arial; background: #f5f5f5; text-align: center; }
-    textarea { width: 80%; height: 100px; margin: 10px; }
-    button { padding: 10px 20px; }
-    .entry { background: white; margin: 10px; padding: 10px; border-radius: 8px; }
-  </style>
-</head>
-<body>
-
-<h1>Daily Journal</h1>
-<textarea id="text"></textarea><br>
-<button onclick="save()">Save</button>
-
-<div id="entries"></div>
-
-<script>
-function save() {
-  let text = document.getElementById("text").value;
-  let div = document.createElement("div");
-  div.className = "entry";
-  div.innerText = text;
-  document.getElementById("entries").appendChild(div);
-}
-</script>
-
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
