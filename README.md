@@ -1,3 +1,4 @@
+
 # 📓 My Journal
 
 A simple, beautiful journaling app that runs entirely in your browser — no installation needed!
@@ -21,3 +22,8 @@ A simple, beautiful journaling app that runs entirely in your browser — no ins
 - 📋 View all your previous entries in the panel below
 - 🗑️ Delete any entry with the ✕ button
 - 💾 Entries are saved in your browser automatically (no account needed)
+
+# Test-Final
+This is for learninig
+4
+
