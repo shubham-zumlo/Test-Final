@@ -7,13 +7,12 @@ export const KEYS = {
   PROFILES: 'jrn_profiles',
 };
 
-// ─── Simple deterministic hash (visual security – not cryptographic) ─────────
-export function hashPassword(pw) {
-  let h = 5381;
-  for (let i = 0; i < pw.length; i++) {
-    h = (Math.imul(h, 31) + pw.charCodeAt(i)) | 0;
-  }
-  return (h >>> 0).toString(36) + '.' + pw.length.toString(36);
+// ─── Password hashing via Web Crypto API (SHA-256 with static pepper) ────────
+export async function hashPassword(pw) {
+  const encoder = new TextEncoder();
+  const data    = encoder.encode('jrn_pepper_v3:' + pw);
+  const buf     = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2, '0')).join('');
 }
 
 // ─── Users ───────────────────────────────────────────────────────────────────
@@ -98,7 +97,7 @@ export function migrateOldEntries(userId) {
     if (!Array.isArray(old) || old.length === 0) return 0;
     if (loadEntries(userId).length > 0) return 0; // already have data
     const migrated = old.map(e => ({
-      id: String(typeof e.id === 'number' ? e.id : Date.now() + Math.random()),
+      id: String(typeof e.id === 'number' ? e.id : crypto.randomUUID()),
       userId,
       content: e.text || '',
       mood: e.mood || '📝',

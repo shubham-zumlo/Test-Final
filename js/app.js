@@ -57,7 +57,7 @@ const state = {
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 function uid() {
-  return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  return crypto.randomUUID();
 }
 
 function wordCount(text) {
@@ -98,13 +98,13 @@ function appNav(name, skipHistory) {
 window.showScreen = appNav;
 
 // ─── Auth handlers ────────────────────────────────────────────────────────────
-function handleSignUp(e) {
+async function handleSignUp(e) {
   e.preventDefault();
   const email    = document.getElementById('signup-email')?.value.trim() || '';
   const password = document.getElementById('signup-password')?.value || '';
   const name     = document.getElementById('signup-name')?.value.trim() || 'Friend';
 
-  const result = signUp(email, password);
+  const result = await signUp(email, password);
   if (!result.ok) { showAuthError('auth-signup', result.error); return; }
 
   saveProfile({ userId: result.user.id, name, avatar: state.selectedSignupAvatar });
@@ -115,12 +115,12 @@ function handleSignUp(e) {
   showToast(`Welcome, ${name}! 🎉`);
 }
 
-function handleLogIn(e) {
+async function handleLogIn(e) {
   e.preventDefault();
   const email    = document.getElementById('login-email')?.value.trim() || '';
   const password = document.getElementById('login-password')?.value || '';
 
-  const result = logIn(email, password);
+  const result = await logIn(email, password);
   if (!result.ok) { showAuthError('auth-login', result.error); return; }
 
   state.user = result.user;
@@ -178,7 +178,8 @@ window.nextPrompt = function() {
 window.helpWrite = function() {
   const ta = document.getElementById('entry-input');
   if (!ta?.value.trim()) {
-    ta.value = STARTERS[Math.floor(Math.random() * STARTERS.length)];
+    const idx = crypto.getRandomValues(new Uint32Array(1))[0] % STARTERS.length;
+    ta.value = STARTERS[idx];
     window.onInput();
   }
   ta?.focus();
