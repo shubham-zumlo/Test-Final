@@ -815,6 +815,7 @@ let selectedWriteMood = '';
 let selectedHomeMood = '';
 let currentPromptIdx = 0;
 let detailEntryId = null;
+let idCounter = 0;
 
 const prompts = [
   'What quietly took care of you today?',
@@ -898,7 +899,7 @@ function saveEntry() {
   if (!text) return;
   const entries = loadEntries();
   entries.push({
-    id: Date.now() + Math.floor(Math.random() * 1000),
+    id: Date.now() + (++idCounter),
     date: new Date().toISOString(),
     text,
     mood: selectedWriteMood || '📝',
@@ -934,7 +935,7 @@ function refreshHome() {
 
   const entries = loadEntries();
   document.getElementById('total-entries').textContent = entries.length;
-  const totalWords = entries.reduce((s, e) => s + (e.text.trim() ? e.text.trim().split(/\s+/).length : 0), 0);
+  const totalWords = entries.reduce((s, e) => { const t = e.text.trim(); return s + (t ? t.split(/\s+/).length : 0); }, 0);
   document.getElementById('total-words').textContent = totalWords > 999 ? (totalWords/1000).toFixed(1)+'k' : totalWords;
   const weekAgo = new Date(now - 7*24*60*60*1000);
   document.getElementById('this-week').textContent = entries.filter(e => new Date(e.date) >= weekAgo).length;
@@ -1103,15 +1104,17 @@ function formatDate(iso) {
   return new Date(iso).toLocaleString(undefined, { weekday:'short', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-/* ─── Live clock ─── */
+/* ─── Live clock (12-hour format to match iOS status bar style) ─── */
 function updateClock() {
   const now = new Date();
   let h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
   document.getElementById('status-time').textContent =
-    h.toString().padStart(2,'0') + ':' + m.toString().padStart(2,'0');
+    h + ':' + m.toString().padStart(2,'0') + ' ' + ampm;
 }
 updateClock();
 setInterval(updateClock, 30000);
